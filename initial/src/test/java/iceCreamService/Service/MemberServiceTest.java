@@ -10,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Optional;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,7 +58,6 @@ public class MemberServiceTest {
 
     @Test
     public void shouldReturnFalseIfMemberDoesNotBelongsToTheTeam() {
-        when(memberRepository.findById("20899")).thenReturn(Optional.empty());
         assertEquals(memberService.isTeamIDAndMemberIdMatch("20976","1234"),false);
     }
 }

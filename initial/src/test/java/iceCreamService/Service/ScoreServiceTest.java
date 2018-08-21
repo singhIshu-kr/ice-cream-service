@@ -62,8 +62,8 @@ public class ScoreServiceTest {
     @Test
     public void shouldResetScoreOfTheMember() {
         Score score = new Score("20976", "123", new Date(), false);
+        scoreService.resetScore("20976");
         verify(scoreRepository,times(1)).findAllByMemberId("20976");
         when(scoreRepository.findAllByMemberId("20976")).thenReturn(asList(score));
-        scoreService.resetScore("20976","123");
     }
 }
