@@ -26,19 +26,16 @@ public class ScoreService {
         }
     }
 
-    public int getScore(String memberId) {
+    public long getScore(String memberId) {
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
-        int score = 0;
-        for (Score memberEntry : memberEntries) {
-            score = memberEntry.isReedemed ? score : ++score ;
-        }
+        long score = memberEntries.stream().filter((memberEntry) -> memberEntry.isReedemed).count();
         return score;
     }
 
     public void resetScore(String memberId, String teamId) {
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
-        for (Score memberEntry : memberEntries) {
+        memberEntries.forEach((memberEntry)->{
             memberEntry.setRedeemed();
-        }
+        });
     }
 }
