@@ -5,11 +5,17 @@ import org.springframework.data.annotation.Id;
 public class Member {
 
     @Id
-    private final String id;
+    public final String id;
     private final String name;
+    public String teamID;
 
-    public Member(String id, String name) {
+    public Member(String id, String name,String teamID) {
         this.id = id;
         this.name = name;
+        this.teamID = teamID;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamID = teamID;
     }
 }
