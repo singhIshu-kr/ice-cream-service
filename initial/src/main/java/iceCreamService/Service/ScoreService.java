@@ -1,12 +1,16 @@
-package iceCreamService.Service;
+package iceCreamService.service;
 
-import iceCreamService.Domain.Score;
-import iceCreamService.Exception.InvalidMemberOrTeamId;
-import iceCreamService.Repository.ScoreRepository;
+import iceCreamService.model.Score;
+import iceCreamService.exception.InvalidMemberOrTeamIdException;
+import iceCreamService.exception.NoScoreToBeReducedException;
+import iceCreamService.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
 public class ScoreService {
     private ScoreRepository scoreRepository;
     private MemberService memberService;
@@ -17,12 +21,13 @@ public class ScoreService {
         this.memberService = memberService;
     }
 
-    public void addScore(Score score) throws InvalidMemberOrTeamId {
+    public void addScore(Score score) throws InvalidMemberOrTeamIdException {
         if(memberService.isTeamIDAndMemberIdMatch(score.memberId,score.teamId)){
+            System.out.println("ADDED=======");
             scoreRepository.save(score);
         }
         else {
-            throw new InvalidMemberOrTeamId("Member Id and Team Id don't match or Don't Exist");
+            throw new InvalidMemberOrTeamIdException("Member Id and Team Id don't match or Don't Exist");
         }
     }
 
@@ -34,6 +39,29 @@ public class ScoreService {
 
     public void resetScore(String memberId) {
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
-        memberEntries.forEach((memberEntry)-> memberEntry.setRedeemed());
+        memberEntries.forEach((memberEntry)-> {
+            memberEntry.setRedeemed();
+            scoreRepository.save(memberEntry);
+        });
+    }
+
+    private List<Score> getNonReedemedEntries(String memberId){
+        List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
+        return memberEntries.stream().filter((memberEntry -> !memberEntry.isReedemed)).collect(Collectors.toList());
+    }
+
+    public void reduceScore(String memberId, String teamId) throws NoScoreToBeReducedException {
+        List<Score> nonReedemedEntries = getNonReedemedEntries(memberId);
+        if(!nonReedemedEntries.isEmpty()){
+            Score score = nonReedemedEntries.get(0);
+            score.setRedeemed();
+            scoreRepository.save(score);
+        }else{
+            throw new NoScoreToBeReducedException("The member has no score to be reduced");
+        }
+    }
+
+    public List<Score> findAllTeams() {
+        return scoreRepository.findAll();
     }
 }

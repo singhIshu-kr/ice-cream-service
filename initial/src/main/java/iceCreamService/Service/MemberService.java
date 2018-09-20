@@ -1,12 +1,16 @@
-package iceCreamService.Service;
+package iceCreamService.service;
 
-import iceCreamService.Domain.Member;
-import iceCreamService.Exception.MemberNotFoundException;
-import iceCreamService.Repository.MemberRepository;
+import iceCreamService.exception.MemberWithIdExistsException;
+import iceCreamService.model.Member;
+import iceCreamService.exception.MemberNotFoundException;
+import iceCreamService.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
+@Service
 public class MemberService {
     private MemberRepository memberRepository;
 
@@ -21,15 +25,17 @@ public class MemberService {
 
     public boolean isTeamIDAndMemberIdMatch(String memberId, String teamId) {
         Optional<Member> member = memberRepository.findById(memberId);
-        if(member.isPresent() && member.get().teamID == teamId ){
+        System.out.println(member.get().teamID.equals(teamId)+"I am Member");
+        if(member.isPresent() && (member.get().teamID.equals(teamId))){
             return true;
         }else {
             return false;
         }
     }
 
-    public void addMember(Member member) {
+    public String addMember(Member member){
         memberRepository.save(member);
+        return "Added";
     }
 
     public void alotTeam(String memberId, String teamId) throws MemberNotFoundException {
@@ -42,5 +48,21 @@ public class MemberService {
         else {
             throw new MemberNotFoundException("Member with this id does'nt exists");
         }
+    }
+
+    public List<Member> getAllMembersOfTeam(String teamID) {
+        return memberRepository.findByTeamID(teamID);
+    }
+
+    public List<Member> findAllTeams() {
+        return memberRepository.findAll();
+    }
+
+    public void removeAll() {
+        memberRepository.deleteAll();
+    }
+
+    public void removeMember(String memberId) {
+        memberRepository.deleteById(memberId);
     }
 }

@@ -1,8 +1,9 @@
 package iceCreamService;
 
-import iceCreamService.Domain.Team;
-import iceCreamService.Repository.TeamRepository;
-import iceCreamService.Service.TeamService;
+import iceCreamService.model.Team;
+import iceCreamService.repository.MemberRepository;
+import iceCreamService.repository.TeamRepository;
+import iceCreamService.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,15 +17,20 @@ public class Application implements CommandLineRunner{
     @Autowired
     private TeamRepository teamRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class,args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        memberRepository.deleteAll();
         teamService = new TeamService(teamRepository);
-        teamRepository.deleteAll();
-        teamService.addTeam(new Team("Magneto","magneto@gmail.com"));
+        teamService.addTeam(new Team("Magneto","magneto@gmail.com","abcd"));
+        teamService.addTeam(new Team("Hero","honda@gmail.com","honda"));
         for (Team team : teamRepository.findAll()) {
             System.out.println(team);
         }

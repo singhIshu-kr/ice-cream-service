@@ -1,9 +1,9 @@
-package iceCreamService.Service;
+package iceCreamService.service;
 
 
-import iceCreamService.Domain.Member;
-import iceCreamService.Exception.MemberNotFoundException;
-import iceCreamService.Repository.MemberRepository;
+import iceCreamService.model.Member;
+import iceCreamService.exception.MemberNotFoundException;
+import iceCreamService.repository.MemberRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +59,12 @@ public class MemberServiceTest {
     @Test
     public void shouldReturnFalseIfMemberDoesNotBelongsToTheTeam() {
         assertEquals(memberService.isTeamIDAndMemberIdMatch("20976","1234"),false);
+    }
+
+    @Test
+    public void shouldReturnAllTheMembersOfParticularTeam() {
+        memberService.getAllMembersOfTeam("abcd1234");
+        verify(memberRepository,times(1)).findByTeamID("abcd1234");
     }
 }
 

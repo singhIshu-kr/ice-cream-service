@@ -1,8 +1,9 @@
-package iceCreamService.Service;
+package iceCreamService.service;
 
-import iceCreamService.Domain.Score;
-import iceCreamService.Exception.InvalidMemberOrTeamId;
-import iceCreamService.Repository.ScoreRepository;
+import iceCreamService.model.Score;
+import iceCreamService.exception.InvalidMemberOrTeamIdException;
+import iceCreamService.exception.NoScoreToBeReducedException;
+import iceCreamService.repository.ScoreRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class ScoreServiceTest {
     }
 
     @Test
-    public void shouldAddAnEntryIfMemberAndTeamAreValid() throws InvalidMemberOrTeamId {
+    public void shouldAddAnEntryIfMemberAndTeamAreValid() throws InvalidMemberOrTeamIdException {
         Score score = new Score("20976", "123", new Date(), false);
         when(memberService.isTeamIDAndMemberIdMatch(score.memberId,score.teamId)).thenReturn(true);
         scoreService.addScore(score);
@@ -64,6 +65,11 @@ public class ScoreServiceTest {
         Score score = new Score("20976", "123", new Date(), false);
         scoreService.resetScore("20976");
         verify(scoreRepository,times(1)).findAllByMemberId("20976");
-        when(scoreRepository.findAllByMemberId("20976")).thenReturn(asList(score));
+    }
+
+    @Test
+    public void shouldReduceScoreOfMember() throws NoScoreToBeReducedException {
+        scoreService.reduceScore("1234","1234");
+        verify(scoreRepository,times(1)).findAllByMemberId("1234");
     }
 }
