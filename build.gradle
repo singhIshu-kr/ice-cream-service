@@ -28,6 +28,7 @@ targetCompatibility = 1.8
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '1.5.1.RELEASE'
     compile("org.mindrot:jbcrypt:0.4")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
