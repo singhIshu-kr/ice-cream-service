@@ -3,6 +3,8 @@ package iceCreamService.controller;
 import iceCreamService.model.Member;
 import iceCreamService.model.Team;
 import iceCreamService.exception.TeamNotFoundException;
+import iceCreamService.request.NewMemberRequest;
+import iceCreamService.request.NewTeamRequest;
 import iceCreamService.service.MemberService;
 import iceCreamService.service.ScoreService;
 import iceCreamService.service.TeamService;
@@ -38,7 +40,7 @@ public class ControllerTest {
 
     @Test
     public void addNewTeam() {
-        AddTeam addTeam = new AddTeam();
+        NewTeamRequest addTeam = new NewTeamRequest();
         addTeam.name = "Magneto";
         addTeam.email = "abcd";
         addTeam.password = "abcd";
@@ -55,7 +57,7 @@ public class ControllerTest {
 
     @Test
     public void addMemberToTeam() {
-        AddMember addMember = new AddMember();
+        NewMemberRequest addMember = new NewMemberRequest();
         addMember.id = "20976";
         addMember.name = "Ishu";
         addMember.teamId = "234";

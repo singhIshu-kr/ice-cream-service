@@ -8,6 +8,8 @@ import iceCreamService.model.Team;
 import iceCreamService.exception.InvalidMemberOrTeamIdException;
 import iceCreamService.exception.NoScoreToBeReducedException;
 import iceCreamService.exception.TeamNotFoundException;
+import iceCreamService.request.*;
+import iceCreamService.response.TeamInfo;
 import iceCreamService.service.MemberService;
 import iceCreamService.service.ScoreService;
 import iceCreamService.service.SessionService;
@@ -46,7 +48,7 @@ public class Controller {
 
     @CrossOrigin
     @PostMapping("/addTeam")
-    public ResponseEntity addNewTeam(@RequestBody AddTeam addTeam) {
+    public ResponseEntity addNewTeam(@RequestBody NewTeamRequest addTeam) {
         Team team = new Team(addTeam.name, addTeam.email, addTeam.password);
         teamService.addTeam(team);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
@@ -76,7 +78,7 @@ public class Controller {
     public ResponseEntity addMemberToTeam(
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken,
-            @RequestBody AddMember addMember) throws MemberWithIdExistsException {
+            @RequestBody NewMemberRequest addMember) throws MemberWithIdExistsException {
         if (sessionService.isValidSession(accessToken, email)) {
             System.out.println(addMember.teamId + "###################");
             Member member = new Member(addMember.name, addMember.teamId);
@@ -228,51 +230,3 @@ public class Controller {
 }
 
 
-class MemberId {
-    public String id;
-}
-
-class MemberInfo {
-    public final String name;
-    public final String id;
-    public final String teamID;
-    public final long score;
-
-    public MemberInfo(String name, String id, String teamID, long score) {
-        this.name = name;
-        this.id = id;
-        this.teamID = teamID;
-        this.score = score;
-    }
-}
-
-class TeamInfo {
-    public final String name;
-    public final List<MemberInfo> memberInfo;
-
-    public TeamInfo(String name, List<MemberInfo> memberInfos) {
-        this.name = name;
-        this.memberInfo = memberInfos;
-    }
-}
-
-class AddTeam {
-    public String name;
-    public String email;
-    public String password;
-}
-
-class AddMember {
-    public String name;
-    public String teamId;
-}
-
-class TeamAndMemberInfo {
-    public String teamId;
-    public String id;
-}
-
-class LoginTeam {
-    public String email;
-    public String password;
-}
