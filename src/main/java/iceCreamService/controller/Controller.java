@@ -49,8 +49,7 @@ public class Controller {
     @CrossOrigin
     @PostMapping("/addTeam")
     public ResponseEntity addNewTeam(@RequestBody NewTeamRequest addTeam) {
-        Team team = new Team(addTeam.name, addTeam.email, addTeam.password);
-        teamService.addTeam(team);
+        teamService.addTeam(addTeam.name,addTeam.email,addTeam.password);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
         sessionService.addSession(token, addTeam.email);
         return new ResponseEntity(token, HttpStatus.OK);
@@ -80,7 +79,6 @@ public class Controller {
             @RequestHeader(value = "accessToken") String accessToken,
             @RequestBody NewMemberRequest addMember) throws MemberWithIdExistsException {
         if (sessionService.isValidSession(accessToken, email)) {
-            System.out.println(addMember.teamId + "###################");
             Member member = new Member(addMember.name, addMember.teamId);
             memberService.addMember(member);
             String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
@@ -207,10 +205,9 @@ public class Controller {
     public ResponseEntity signOutTeam(
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken) {
-        System.out.println(email + accessToken + "signout");
         if (sessionService.isValidSession(accessToken, email)) {
             sessionService.removeSession(accessToken);
-            System.out.println("sign out");
+            System.out.println(email + accessToken + "signout");
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -221,12 +218,10 @@ public class Controller {
     public ResponseEntity isLoggedIn(
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken) {
-        System.out.println("lof33333333");
         if (sessionService.isValidSession(accessToken, email)) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
+        System.out.println("lof33333333");
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }
-
-

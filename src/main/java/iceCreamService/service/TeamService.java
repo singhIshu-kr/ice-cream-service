@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Service
 public class TeamService {
@@ -19,8 +20,9 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
-    public void addTeam(Team team) {
-        System.out.println(team.toString()  );
+    public void addTeam(String name,String email,String password) {
+        String encryptedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        Team team = new Team(name, email, encryptedPassword);
         teamRepository.save(team);
     }
 
@@ -43,8 +45,11 @@ public class TeamService {
     }
 
     public boolean isValidEmailAndPassword(String email, String password) {
-        System.out.println(teamRepository.existsById(email) + " "+teamRepository.existsByPassword(password));
-        return teamRepository.existsById(email) && teamRepository.existsByPassword(password);
+        Optional<Team> team = teamRepository.findByEmail(email);
+        if (team.isPresent()){
+            return BCrypt.checkpw(password,team.get().password);
+        }
+        return false;
     }
 
     public String getName(String teamID) {

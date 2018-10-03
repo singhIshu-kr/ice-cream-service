@@ -29,8 +29,8 @@ public class Application implements CommandLineRunner{
     public void run(String... args) {
         memberRepository.deleteAll();
         teamService = new TeamService(teamRepository);
-        teamService.addTeam(new Team("Magneto","magneto@gmail.com","abcd"));
-        teamService.addTeam(new Team("Hero","honda@gmail.com","honda"));
+        teamService.addTeam("Hero","honda@gmail.com","honda");
+        teamService.addTeam("Magneto","magneto@gmail.com","abcd");
         for (Team team : teamRepository.findAll()) {
             System.out.println(team);
         }
