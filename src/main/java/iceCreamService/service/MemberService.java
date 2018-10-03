@@ -33,9 +33,18 @@ public class MemberService {
         }
     }
 
-    public String addMember(Member member){
-        memberRepository.save(member);
-        return "Added";
+    public String addMember(Member member) throws MemberWithIdExistsException {
+        if(!isMemberWithSameName(member.teamID,member.name)){
+            memberRepository.save(member);
+            return "Added";
+        }
+        throw new MemberWithIdExistsException("Member with this name exists");
+    }
+
+    public boolean isMemberWithSameName(String teamId, String name){
+        List<Member> teamMembers = memberRepository.findByTeamID(teamId);
+        System.out.println(teamMembers.stream().anyMatch((member -> member.name.equals(name))));
+        return teamMembers.stream().anyMatch((member -> member.name.equals(name)));
     }
 
     public void alotTeam(String memberId, String teamId) throws MemberNotFoundException {
