@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Date;
 
@@ -62,13 +63,22 @@ public class ScoreServiceTest {
 
     @Test
     public void shouldResetScoreOfTheMember() {
-        Score score = new Score("20976", "123", new Date(), false);
         scoreService.resetScore("20976");
         verify(scoreRepository,times(1)).findAllByMemberId("20976");
     }
 
     @Test
     public void shouldReduceScoreOfMember() throws NoScoreToBeReducedException {
+        Score score = new Score("20976", "123", new Date(), false);
+        when(scoreService.getNonReedemedEntries("1234")).thenReturn(asList(score));
+        scoreService.reduceScore("1234","1234");
+        verify(scoreRepository,times(1)).findAllByMemberId("1234");
+    }
+
+
+    @Test(expected = NoScoreToBeReducedException.class)
+    public void shouldNotReduceScoreOfMemberIfThereAreNoEntries() throws NoScoreToBeReducedException {
+        when(scoreService.getNonReedemedEntries("1234")).thenReturn(asList());
         scoreService.reduceScore("1234","1234");
         verify(scoreRepository,times(1)).findAllByMemberId("1234");
     }

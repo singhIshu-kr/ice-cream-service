@@ -4,7 +4,7 @@ package iceCreamService.controller;
 import iceCreamService.exception.MemberWithIdExistsException;
 import iceCreamService.model.Member;
 import iceCreamService.model.Score;
-import iceCreamService.model.Team;
+import iceCreamService.model.User;
 import iceCreamService.exception.InvalidMemberOrTeamIdException;
 import iceCreamService.exception.NoScoreToBeReducedException;
 import iceCreamService.exception.TeamNotFoundException;
@@ -13,7 +13,7 @@ import iceCreamService.response.TeamInfo;
 import iceCreamService.service.MemberService;
 import iceCreamService.service.ScoreService;
 import iceCreamService.service.SessionService;
-import iceCreamService.service.TeamService;
+import iceCreamService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +31,14 @@ public class Controller {
     private SessionService sessionService;
     private MemberService memberService;
     private ScoreService scoreService;
-    private TeamService teamService;
+    private UserService userService;
 
     @Autowired
-    public Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, TeamService teamService) {
+    public Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, UserService userService) {
         this.sessionService = sessionService;
         this.memberService = memberService;
         this.scoreService = scoreService;
-        this.teamService = teamService;
+        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -47,9 +47,9 @@ public class Controller {
     }
 
     @CrossOrigin
-    @PostMapping("/addTeam")
+    @PostMapping("/addUser")
     public ResponseEntity addNewTeam(@RequestBody NewTeamRequest addTeam) {
-        teamService.addTeam(addTeam.name,addTeam.email,addTeam.password);
+        userService.addUser(addTeam.name,addTeam.email,addTeam.password);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
         sessionService.addSession(token, addTeam.email);
         return new ResponseEntity(token, HttpStatus.OK);
@@ -57,19 +57,19 @@ public class Controller {
 
     @CrossOrigin
     @GetMapping("/getTeam/{email}")
-    public Team getListOfMembers(@PathVariable String email) throws TeamNotFoundException {
-        return teamService.getTeamByEmail(email);
+    public User getListOfMembers(@PathVariable String email) throws TeamNotFoundException {
+        return userService.getTeamByEmail(email);
     }
 
     @CrossOrigin
     @GetMapping("/allTeam")
-    public List<Team> getListOfTeam() {
-        return teamService.findAllTeams();
+    public List<User> getListOfTeam() {
+        return userService.findAllTeams();
     }
 
     @GetMapping("/allMember")
     public List<Member> getListOfMembers() {
-        return memberService.findAllTeams();
+        return memberService.findAllMembers();
     }
 
     @CrossOrigin
@@ -134,7 +134,7 @@ public class Controller {
                 MemberInfo memberInfo = new MemberInfo(member.name, member.id, member.teamID, score);
                 memberInfos.add(memberInfo);
             }));
-            String teamName = teamService.getName(email);
+            String teamName = userService.getName(email);
             TeamInfo teamInfo = new TeamInfo(teamName, memberInfos);
             return new ResponseEntity(teamInfo, HttpStatus.OK);
         }
@@ -191,7 +191,7 @@ public class Controller {
     @PostMapping("/loginTeam")
     public ResponseEntity loginTeam(@RequestBody LoginTeam loginTeam) {
         System.out.println(loginTeam.email + loginTeam.password);
-        if (teamService.isValidEmailAndPassword(loginTeam.email, loginTeam.password)) {
+        if (userService.isValidEmailAndPassword(loginTeam.email, loginTeam.password)) {
             String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
             sessionService.addSession(token, loginTeam.email);
             return new ResponseEntity(token, HttpStatus.OK);

@@ -13,7 +13,7 @@ git clone https://github.com/singhIshu/ice-cream-service.git
 
 ### Description 
 
-This service is used to store and serve all the details of the team and member.
+This service is used to store and serve all the details of the user and member.
 It has three basic blocks 
  * Member
  * Team

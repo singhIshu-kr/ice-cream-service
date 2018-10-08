@@ -63,7 +63,7 @@ public class MemberService {
         return memberRepository.findByTeamID(teamID);
     }
 
-    public List<Member> findAllTeams() {
+    public List<Member> findAllMembers() {
         return memberRepository.findAll();
     }
 

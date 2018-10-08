@@ -23,11 +23,10 @@ public class ScoreService {
 
     public void addScore(Score score) throws InvalidMemberOrTeamIdException {
         if(memberService.isTeamIDAndMemberIdMatch(score.memberId,score.teamId)){
-            System.out.println("ADDED=======");
             scoreRepository.save(score);
         }
         else {
-            throw new InvalidMemberOrTeamIdException("Member Id and Team Id don't match or Don't Exist");
+            throw new InvalidMemberOrTeamIdException("Member Id and User Id don't match or Don't Exist");
         }
     }
 
@@ -45,7 +44,7 @@ public class ScoreService {
         });
     }
 
-    private List<Score> getNonReedemedEntries(String memberId){
+    public List<Score> getNonReedemedEntries(String memberId){
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
         return memberEntries.stream().filter((memberEntry -> !memberEntry.isReedemed)).collect(Collectors.toList());
     }

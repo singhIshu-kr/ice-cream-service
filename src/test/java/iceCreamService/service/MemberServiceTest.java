@@ -1,6 +1,7 @@
 package iceCreamService.service;
 
 
+import iceCreamService.exception.MemberWithIdExistsException;
 import iceCreamService.model.Member;
 import iceCreamService.exception.MemberNotFoundException;
 import iceCreamService.repository.MemberRepository;
@@ -28,15 +29,15 @@ public class MemberServiceTest {
     }
 
     @Test
-    public void shouldAddMember() {
-        Member member = new Member("20976", "Ishu", "");
+    public void shouldAddMember() throws MemberWithIdExistsException {
+        Member member = new Member( "Ishu", "1234");
         memberService.addMember(member);
         verify(memberRepository,times(1)).save(member);
     }
 
     @Test
     public void shouldAlotMemberATeam() throws MemberNotFoundException {
-        Member member = new Member("20976", "Ishu", "");
+        Member member = new Member("Ishu", "1234");
         when(memberRepository.findById("20976")).thenReturn(java.util.Optional.ofNullable(member));
         memberService.alotTeam("20976","1234");
         verify(memberRepository,times(1)).findById("20976");
@@ -51,13 +52,15 @@ public class MemberServiceTest {
 
     @Test
     public void shouldReturnTrueIfMemberBelongsToTheTeam() {
-        Member member = new Member("20976", "Ishu", "1234");
+        Member member = new Member( "Ishu", "1234");
         when(memberRepository.findById("20976")).thenReturn(java.util.Optional.ofNullable(member));
         assertEquals(memberService.isTeamIDAndMemberIdMatch("20976","1234"),true);
     }
 
     @Test
     public void shouldReturnFalseIfMemberDoesNotBelongsToTheTeam() {
+        Member member = new Member( "Ishu", "1235");
+        when(memberRepository.findById("20976")).thenReturn(java.util.Optional.ofNullable(member));
         assertEquals(memberService.isTeamIDAndMemberIdMatch("20976","1234"),false);
     }
 

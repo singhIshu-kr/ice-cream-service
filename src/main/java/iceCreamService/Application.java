@@ -1,21 +1,24 @@
 package iceCreamService;
 
-import iceCreamService.model.Team;
+import iceCreamService.model.User;
 import iceCreamService.repository.MemberRepository;
-import iceCreamService.repository.TeamRepository;
-import iceCreamService.service.TeamService;
+import iceCreamService.repository.UserRepository;
+import iceCreamService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 @SpringBootApplication
 public class Application implements CommandLineRunner{
 
-    private TeamService teamService;
+    private UserService userService;
 
     @Autowired
-    private TeamRepository teamRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -28,11 +31,13 @@ public class Application implements CommandLineRunner{
     @Override
     public void run(String... args) {
         memberRepository.deleteAll();
-        teamService = new TeamService(teamRepository);
-        teamService.addTeam("Hero","honda@gmail.com","honda");
-        teamService.addTeam("Magneto","magneto@gmail.com","abcd");
-        for (Team team : teamRepository.findAll()) {
-            System.out.println(team);
+        userService = new UserService(userRepository);
+        userService.addUser("Hero","honda@gmail.com","honda");
+        userService.addUser("Magneto","magneto@gmail.com","abcd");
+        for (User user : userRepository.findAll()) {
+            System.out.println(user);
         }
+
+        System.out.println(Arrays.stream(new String[]{"123","456"}).collect(Collectors.joining())+"demmoooooo");
     }
 }
