@@ -48,10 +48,10 @@ public class Controller {
 
     @CrossOrigin
     @PostMapping("/addUser")
-    public ResponseEntity addNewTeam(@RequestBody NewTeamRequest addTeam) {
-        userService.addUser(addTeam.name,addTeam.email,addTeam.password);
+    public ResponseEntity addNewTeam(@RequestBody NewUserRequest newUserRequest) {
+        userService.addUser(newUserRequest.name,newUserRequest.email,newUserRequest.password);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
-        sessionService.addSession(token, addTeam.email);
+        sessionService.addSession(token, newUserRequest.email);
         return new ResponseEntity(token, HttpStatus.OK);
     }
 
@@ -188,8 +188,8 @@ public class Controller {
     }
 
     @CrossOrigin
-    @PostMapping("/loginTeam")
-    public ResponseEntity loginTeam(@RequestBody LoginTeam loginTeam) {
+    @PostMapping("/loginUser")
+    public ResponseEntity loginUser(@RequestBody LoginTeam loginTeam) {
         System.out.println(loginTeam.email + loginTeam.password);
         if (userService.isValidEmailAndPassword(loginTeam.email, loginTeam.password)) {
             String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
@@ -201,13 +201,12 @@ public class Controller {
     }
 
     @CrossOrigin
-    @PostMapping("/signOutTeam")
-    public ResponseEntity signOutTeam(
+    @PostMapping("/signOutUser")
+    public ResponseEntity signOutUser(
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken) {
         if (sessionService.isValidSession(accessToken, email)) {
             sessionService.removeSession(accessToken);
-            System.out.println(email + accessToken + "signout");
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -221,7 +220,6 @@ public class Controller {
         if (sessionService.isValidSession(accessToken, email)) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        System.out.println("lof33333333");
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 }

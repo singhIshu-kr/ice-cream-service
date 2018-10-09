@@ -5,7 +5,7 @@ import iceCreamService.model.Member;
 import iceCreamService.model.User;
 import iceCreamService.exception.TeamNotFoundException;
 import iceCreamService.request.NewMemberRequest;
-import iceCreamService.request.NewTeamRequest;
+import iceCreamService.request.NewUserRequest;
 import iceCreamService.service.MemberService;
 import iceCreamService.service.ScoreService;
 import iceCreamService.service.SessionService;
@@ -46,7 +46,7 @@ public class ControllerTest {
 
     @Test
     public void addNewTeam() {
-        NewTeamRequest addTeam = new NewTeamRequest();
+        NewUserRequest addTeam = new NewUserRequest();
         addTeam.name = "Magneto";
         addTeam.email = "abcd";
         addTeam.password = "abcd";
