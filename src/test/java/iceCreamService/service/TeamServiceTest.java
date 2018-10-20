@@ -33,5 +33,4 @@ public class TeamServiceTest {
         teamService.addTeam("Magneto");
         verify(teamRepository,times(1)).save(magneto);
     }
-
 }

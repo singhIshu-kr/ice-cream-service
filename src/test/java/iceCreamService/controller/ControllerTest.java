@@ -5,11 +5,9 @@ import iceCreamService.model.Member;
 import iceCreamService.model.User;
 import iceCreamService.exception.TeamNotFoundException;
 import iceCreamService.request.NewMemberRequest;
+import iceCreamService.request.NewTeamRequest;
 import iceCreamService.request.NewUserRequest;
-import iceCreamService.service.MemberService;
-import iceCreamService.service.ScoreService;
-import iceCreamService.service.SessionService;
-import iceCreamService.service.UserService;
+import iceCreamService.service.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,24 +32,29 @@ public class ControllerTest {
     private ScoreService scoreService;
 
     @Mock
+    private TeamService teamService;
+
+    @Mock
     private SessionService sessionService;
+
+    @Mock
+    private RoleTrackerService roleTrackerService;
 
     public Controller controller;
 
     @Before
     public void setUp() {
-
-        controller = new Controller(sessionService, memberService, scoreService, userService);
+        controller = new Controller(sessionService, memberService, scoreService, userService,teamService,roleTrackerService);
     }
 
     @Test
-    public void addNewTeam() {
-        NewUserRequest addTeam = new NewUserRequest();
-        addTeam.name = "Magneto";
-        addTeam.email = "abcd";
-        addTeam.password = "abcd";
+    public void addNewUser() {
+        NewUserRequest newUser = new NewUserRequest();
+        newUser.name = "Magneto";
+        newUser.email = "abcd";
+        newUser.password = "abcd";
         User user = new User("Magneto", "abcd","abcd");
-        controller.addNewTeam(addTeam);
+        controller.addNewUser(newUser);
         verify(userService,times(1)).addUser(user.name,user.email,user.password);
     }
 
@@ -76,5 +79,23 @@ public class ControllerTest {
     public void getAllMembersOfTeam() throws TeamNotFoundException {
         controller.getAllMembersOfTeam("1234");
         verify(memberService,times(1)).getAllMembersOfTeam("1234");
+    }
+
+    @Test
+    public void shouldAddTeamForUser() {
+        NewTeamRequest newTeamRequest = new NewTeamRequest();
+        newTeamRequest.userId="Debu";
+        newTeamRequest.teamName="Magneto";
+        when(sessionService.isValidSession("abcd","1234")).thenReturn(true);
+        controller.addNewTeam("1234","abcd",newTeamRequest);
+        verify(teamService,times(1)).addTeam("Magneto");
+        verify(roleTrackerService,times(1)).addRoleTrack("Magneto","Debu");
+    }
+
+    @Test
+    public void shouldReturnAllTheTeamsOfUser(){
+        when(sessionService.isValidSession("abcd","1234")).thenReturn(true);
+        controller.getAllTeamsOfUser("1234","abcd","Debu");
+        verify(roleTrackerService,times(1)).getAllTeamsOfUser("Debu");
     }
 }

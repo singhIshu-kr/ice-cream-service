@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TeamService {
+public class  TeamService {
     private TeamRepository teamRepository;
 
     @Autowired
@@ -15,8 +15,8 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
-    public void addTeam(String magneto) {
-        Team team = new Team(magneto);
+    public void addTeam(String teamName) {
+        Team team = new Team(teamName);
         teamRepository.save(team);
     }
 }

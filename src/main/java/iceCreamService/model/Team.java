@@ -9,25 +9,23 @@ import java.util.Objects;
 public class Team {
 
     @Id
-    public String id;
     public String name;
 
     public Team(String name) {
         this.name = name;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Team team = (Team) o;
-        return Objects.equals(id, team.id) &&
-                Objects.equals(name, team.name);
+        return Objects.equals(name, team.name);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 }

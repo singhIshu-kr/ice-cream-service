@@ -3,17 +3,16 @@ package iceCreamService.controller;
 
 import iceCreamService.exception.MemberWithIdExistsException;
 import iceCreamService.model.Member;
+import iceCreamService.model.RoleTrack;
 import iceCreamService.model.Score;
 import iceCreamService.model.User;
 import iceCreamService.exception.InvalidMemberOrTeamIdException;
 import iceCreamService.exception.NoScoreToBeReducedException;
 import iceCreamService.exception.TeamNotFoundException;
 import iceCreamService.request.*;
+import iceCreamService.response.RelatedTeams;
 import iceCreamService.response.TeamInfo;
-import iceCreamService.service.MemberService;
-import iceCreamService.service.ScoreService;
-import iceCreamService.service.SessionService;
-import iceCreamService.service.UserService;
+import iceCreamService.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +31,19 @@ public class Controller {
     private MemberService memberService;
     private ScoreService scoreService;
     private UserService userService;
+    private TeamService teamService;
+    private RoleTrackerService roleTrackerService;
 
     @Autowired
-    public Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, UserService userService) {
+    public Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, UserService userService, TeamService teamService, RoleTrackerService roleTrackerService) {
         this.sessionService = sessionService;
         this.memberService = memberService;
         this.scoreService = scoreService;
         this.userService = userService;
+        this.teamService = teamService;
+        this.roleTrackerService = roleTrackerService;
     }
+
 
     @GetMapping("/")
     public String getHello() {
@@ -48,7 +52,7 @@ public class Controller {
 
     @CrossOrigin
     @PostMapping("/addUser")
-    public ResponseEntity addNewTeam(@RequestBody NewUserRequest newUserRequest) {
+    public ResponseEntity addNewUser(@RequestBody NewUserRequest newUserRequest) {
         userService.addUser(newUserRequest.name,newUserRequest.email,newUserRequest.password);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
         sessionService.addSession(token, newUserRequest.email);
@@ -219,6 +223,34 @@ public class Controller {
             @RequestHeader(value = "accessToken") String accessToken) {
         if (sessionService.isValidSession(accessToken, email)) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @CrossOrigin
+    @PostMapping("/newTeam")
+    public ResponseEntity addNewTeam(
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
+            @RequestBody NewTeamRequest newTeamRequest){
+        if (sessionService.isValidSession(accessToken,email)){
+            teamService.addTeam(newTeamRequest.teamName);
+            roleTrackerService.addRoleTrack(newTeamRequest.teamName,newTeamRequest.userId);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @CrossOrigin
+    @GetMapping("/myTeams/{userId}")
+    public ResponseEntity getAllTeamsOfUser(
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
+            @PathVariable String userId) {
+        if (sessionService.isValidSession(accessToken,email)){
+            List<RoleTrack> allTeamsOfUser = roleTrackerService.getAllTeamsOfUser(userId);
+            RelatedTeams relatedTeams = new RelatedTeams(allTeamsOfUser);
+            return new ResponseEntity(relatedTeams,HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
