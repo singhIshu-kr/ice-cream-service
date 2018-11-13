@@ -1,13 +1,15 @@
 package iceCreamService.repository;
 
-import iceCreamService.model.RoleTrack;
+import iceCreamService.model.Role;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface RoleTrackerRepository extends MongoRepository<RoleTrack,String> {
+public interface RoleRepository extends MongoRepository<Role,String> {
 
-    List<RoleTrack> findByUserId(String userId);
+    List<Role> findByUserId(String userId);
+
+    List<Role> findByTeamId(String teamId);
 }

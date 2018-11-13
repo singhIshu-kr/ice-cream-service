@@ -26,7 +26,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteTeam(String email) {
+    void deleteTeam(String email) {
         userRepository.deleteByEmail(email);
     }
 
@@ -40,19 +40,20 @@ public class UserService {
         }
     }
 
-    public List<User> findAllTeams() {
+    List<User> findAllTeams() {
         return userRepository.findAll();
     }
 
     public boolean isValidEmailAndPassword(String email, String password) {
         Optional<User> team = userRepository.findByEmail(email);
-        if (team.isPresent()){
-            return BCrypt.checkpw(password,team.get().password);
-        }
-        return false;
+        return team.filter(user -> BCrypt.checkpw(password, user.password)).isPresent();
     }
 
     public String getName(String teamID) {
         return userRepository.findById(teamID).get().name;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

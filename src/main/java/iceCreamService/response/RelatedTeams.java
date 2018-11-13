@@ -1,13 +1,13 @@
 package iceCreamService.response;
 
-import iceCreamService.model.RoleTrack;
+import iceCreamService.model.Role;
 
 import java.util.List;
 
 public class RelatedTeams {
-    private List<RoleTrack> allTeamsOfUser;
+    public List<Role> allTeamsOfUser;
 
-    public RelatedTeams(List<RoleTrack> allTeamsOfUser) {
+    public RelatedTeams(List<Role> allTeamsOfUser) {
         this.allTeamsOfUser = allTeamsOfUser;
     }
 }

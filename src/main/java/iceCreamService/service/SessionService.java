@@ -23,10 +23,7 @@ public class SessionService {
 
     public boolean isValidSession(String token,String email){
         Optional<Session> session = sessionRepository.findById(token);
-        if(session.isPresent()){
-            return session.get().emailId.equals(email);
-        }
-        return false;
+        return session.map(session1 -> session1.emailId.equals(email)).orElse(false);
     }
 
     public void removeSession(String accessToken) {

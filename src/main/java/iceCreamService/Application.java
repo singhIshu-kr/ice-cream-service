@@ -1,8 +1,6 @@
 package iceCreamService;
 
-import iceCreamService.model.User;
-import iceCreamService.repository.MemberRepository;
-import iceCreamService.repository.UserRepository;
+import iceCreamService.repository.*;
 import iceCreamService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +21,18 @@ public class Application implements CommandLineRunner{
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+    @Autowired
+    private SessionRepository sessionRepository;
+
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class,args);
@@ -30,13 +40,19 @@ public class Application implements CommandLineRunner{
 
     @Override
     public void run(String... args) {
-        memberRepository.deleteAll();
+//        userRepository.deleteAll();
+//        roleRepository.deleteAll();
+//        memberRepository.deleteAll();
+//        teamRepository.deleteAll();
+//        scoreRepository.deleteAll();
+//        sessionRepository.deleteAll();
+
         userService = new UserService(userRepository);
-        userService.addUser("Hero","honda@gmail.com","honda");
-        userService.addUser("Magneto","magneto@gmail.com","abcd");
-        for (User user : userRepository.findAll()) {
-            System.out.println(user);
-        }
+//        userService.addUser("Hero","honda@gmail.com","honda");
+//        userService.addUser("Magneto","magneto@gmail.com","abcd");
+//        for (User user : userRepository.findAll()) {
+//            System.out.println(user);
+//        }
 
         System.out.println(Arrays.stream(new String[]{"123","456"}).collect(Collectors.joining())+"demmoooooo");
     }

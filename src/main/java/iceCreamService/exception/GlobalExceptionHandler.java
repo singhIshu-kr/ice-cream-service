@@ -15,4 +15,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity handleUserNotFoundException(BadRequestException ex) {
         return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public final ResponseEntity handleResourceNotFoundException(ResourceNotFoundException ex){
+        return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

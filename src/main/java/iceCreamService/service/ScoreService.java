@@ -16,7 +16,7 @@ public class ScoreService {
     private MemberService memberService;
 
     @Autowired
-    public ScoreService(ScoreRepository scoreRepository, MemberService memberService) {
+    ScoreService(ScoreRepository scoreRepository, MemberService memberService) {
         this.scoreRepository = scoreRepository;
         this.memberService = memberService;
     }
@@ -32,8 +32,7 @@ public class ScoreService {
 
     public long getScore(String memberId) {
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
-        long score = memberEntries.stream().filter((memberEntry) -> !memberEntry.isReedemed).count();
-        return score;
+        return memberEntries.stream().filter((memberEntry) -> !memberEntry.isReedemed).count();
     }
 
     public void resetScore(String memberId) {
@@ -44,7 +43,7 @@ public class ScoreService {
         });
     }
 
-    public List<Score> getNonReedemedEntries(String memberId){
+    List<Score> getNonReedemedEntries(String memberId){
         List<Score> memberEntries = scoreRepository.findAllByMemberId(memberId);
         return memberEntries.stream().filter((memberEntry -> !memberEntry.isReedemed)).collect(Collectors.toList());
     }

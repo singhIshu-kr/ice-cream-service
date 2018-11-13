@@ -1,14 +1,8 @@
 package iceCreamService.controller;
 
 
-import iceCreamService.exception.MemberWithIdExistsException;
-import iceCreamService.model.Member;
-import iceCreamService.model.RoleTrack;
-import iceCreamService.model.Score;
-import iceCreamService.model.User;
-import iceCreamService.exception.InvalidMemberOrTeamIdException;
-import iceCreamService.exception.NoScoreToBeReducedException;
-import iceCreamService.exception.TeamNotFoundException;
+import iceCreamService.exception.*;
+import iceCreamService.model.*;
 import iceCreamService.request.*;
 import iceCreamService.response.RelatedTeams;
 import iceCreamService.response.TeamInfo;
@@ -32,18 +26,27 @@ public class Controller {
     private ScoreService scoreService;
     private UserService userService;
     private TeamService teamService;
-    private RoleTrackerService roleTrackerService;
+    private RoleManagerService roleManagerService;
 
     @Autowired
-    public Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, UserService userService, TeamService teamService, RoleTrackerService roleTrackerService) {
+    Controller(SessionService sessionService, MemberService memberService, ScoreService scoreService, UserService userService, TeamService teamService, RoleManagerService roleManagerService) {
         this.sessionService = sessionService;
         this.memberService = memberService;
         this.scoreService = scoreService;
         this.userService = userService;
         this.teamService = teamService;
-        this.roleTrackerService = roleTrackerService;
+        this.roleManagerService = roleManagerService;
     }
 
+    @GetMapping("/allUsers")
+    public List<User> getAllTheUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/allRoles")
+    public List<Role> getAllTheTeamWithRoles() {
+        return roleManagerService.getAllEntries();
+    }
 
     @GetMapping("/")
     public String getHello() {
@@ -52,8 +55,8 @@ public class Controller {
 
     @CrossOrigin
     @PostMapping("/addUser")
-    public ResponseEntity addNewUser(@RequestBody NewUserRequest newUserRequest) {
-        userService.addUser(newUserRequest.name,newUserRequest.email,newUserRequest.password);
+    ResponseEntity addNewUser(@RequestBody NewUserRequest newUserRequest) {
+        userService.addUser(newUserRequest.name, newUserRequest.email, newUserRequest.password);
         String token = UUID.randomUUID().toString() + ":" + System.currentTimeMillis();
         sessionService.addSession(token, newUserRequest.email);
         return new ResponseEntity(token, HttpStatus.OK);
@@ -63,12 +66,6 @@ public class Controller {
     @GetMapping("/getTeam/{email}")
     public User getListOfMembers(@PathVariable String email) throws TeamNotFoundException {
         return userService.getTeamByEmail(email);
-    }
-
-    @CrossOrigin
-    @GetMapping("/allTeam")
-    public List<User> getListOfTeam() {
-        return userService.findAllTeams();
     }
 
     @GetMapping("/allMember")
@@ -130,7 +127,7 @@ public class Controller {
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken,
             @PathVariable String teamID) {
-        if (sessionService.isValidSession(accessToken, email)) {
+        if (sessionService.isValidSession(accessToken, email) && roleManagerService.isTeamOfSameUser(email, teamID)) {
             List<Member> allMembersOfTeam = memberService.getAllMembersOfTeam(teamID);
             ArrayList<MemberInfo> memberInfos = new ArrayList<>();
             allMembersOfTeam.forEach((member -> {
@@ -232,10 +229,10 @@ public class Controller {
     public ResponseEntity addNewTeam(
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken,
-            @RequestBody NewTeamRequest newTeamRequest){
-        if (sessionService.isValidSession(accessToken,email)){
+            @RequestBody NewTeamRequest newTeamRequest) {
+        if (sessionService.isValidSession(accessToken, email)) {
             teamService.addTeam(newTeamRequest.teamName);
-            roleTrackerService.addRoleTrack(newTeamRequest.teamName,newTeamRequest.userId);
+            roleManagerService.addRoleTrack(newTeamRequest.teamName, newTeamRequest.userId, "ADMIN");
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -247,10 +244,71 @@ public class Controller {
             @RequestHeader(value = "email") String email,
             @RequestHeader(value = "accessToken") String accessToken,
             @PathVariable String userId) {
-        if (sessionService.isValidSession(accessToken,email)){
-            List<RoleTrack> allTeamsOfUser = roleTrackerService.getAllTeamsOfUser(userId);
+        if (sessionService.isValidSession(accessToken, email)) {
+            List<Role> allTeamsOfUser = roleManagerService.getAllTeamsOfUser(email);
             RelatedTeams relatedTeams = new RelatedTeams(allTeamsOfUser);
-            return new ResponseEntity(relatedTeams,HttpStatus.OK);
+            return new ResponseEntity(relatedTeams, HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/allTeams")
+    public List<Team> getAllTeams() {
+        return teamService.getAllTeams();
+    }
+
+    @GetMapping("/allMembers")
+    public List<Member> getAllMembers() {
+        return memberService.getAllMembers();
+    }
+
+    @CrossOrigin
+    @GetMapping("/search/{teamId}")
+    public ResponseEntity searchTeam(
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
+            @PathVariable String teamId) throws ResourceNotFoundException {
+        if (sessionService.isValidSession(accessToken, email)) {
+            Team team = teamService.getTeam(teamId);
+            return new ResponseEntity(team, HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @CrossOrigin
+    @PostMapping("/request")
+    public ResponseEntity requestTeamAccess(
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
+            @RequestBody RequestAccess requestAccess) throws InvalidRequestAccess {
+        if (sessionService.isValidSession(accessToken, email)) {
+            roleManagerService.requestAccessOfTeam(requestAccess.userId, requestAccess.teamName);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/permitAccess")
+    public ResponseEntity alotRole(
+//            @RequestHeader(value = "email") String email,
+//            @RequestHeader(value = "accessToken") String accessToken,
+            @RequestBody RoleUpdate roleUpdate) throws NoRoleForUserAndTeam {
+//        if (sessionService.isValidSession(accessToken, email)) {
+            roleManagerService.updateRole(roleUpdate.userId, roleUpdate.teamName, roleUpdate.role);
+            return new ResponseEntity(HttpStatus.OK);
+//        }
+//        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @CrossOrigin
+    @GetMapping("/allRequests/{userId}")
+    public ResponseEntity getAllAccessRequests(
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
+            @PathVariable String userId){
+        if (sessionService.isValidSession(accessToken, email)) {
+            List<Role> allAccessRequests = roleManagerService.getAllAccessRequests(userId);
+            return new ResponseEntity(allAccessRequests, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
