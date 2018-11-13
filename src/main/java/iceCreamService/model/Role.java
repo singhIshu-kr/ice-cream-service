@@ -19,4 +19,20 @@ public class Role {
         this.role = role;
         System.out.println(this.role+role+"+++++++++++++++++");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role1 = (Role) o;
+        return Objects.equals(userId, role1.userId) &&
+                Objects.equals(teamId, role1.teamId) &&
+                Objects.equals(role, role1.role);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(userId, teamId, role);
+    }
 }

@@ -32,5 +32,4 @@ public class RoleManagerServiceTest {
         verify(roleRepository,times(1)).save(role);
     }
 
-
 }
