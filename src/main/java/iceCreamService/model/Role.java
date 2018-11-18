@@ -1,10 +1,14 @@
 package iceCreamService.model;
 
 
+import org.springframework.data.annotation.Id;
+
 import java.util.Objects;
 
 public class Role {
 
+    @Id
+    public String id;
     public String userId;
     public String teamId;
     public String role;
@@ -34,5 +38,14 @@ public class Role {
     public int hashCode() {
 
         return Objects.hash(userId, teamId, role);
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "userId='" + userId + '\'' +
+                ", teamId='" + teamId + '\'' +
+                ", role='" + role + '\'' +
+                '}';
     }
 }

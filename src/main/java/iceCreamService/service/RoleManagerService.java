@@ -58,20 +58,19 @@ public class RoleManagerService {
         }
     }
 
-    public Role getRoleInfoOf(String userId, String teamName) throws NoRoleForUserAndTeam {
+    public Role getRoleInfoOf(String userId, String teamName, String roleType) throws NoRoleForUserAndTeam {
         List<Role> byTeamId = roleRepository.findByTeamId(teamName);
-        List<Role> roleInfo = byTeamId.stream().filter(role -> role.userId.equals(userId)).collect(Collectors.toList());
+        List<Role> roleInfo = byTeamId.stream().filter(role -> role.userId.equals(userId) && role.role.equals(roleType)).collect(Collectors.toList());
         if(roleInfo.isEmpty()){
             throw new NoRoleForUserAndTeam("No role present for this user and team");
         }
-        System.out.println(roleInfo.get(0));
         return roleInfo.get(0);
     }
 
 
-    public void updateRole(String userId, String teamName, String role) throws NoRoleForUserAndTeam {
-        Role roleInfo = getRoleInfoOf(userId, teamName);
-        roleInfo.setRole(role);
+    public void updateRole(String userId, String teamName, String newRole, String oldRole) throws NoRoleForUserAndTeam {
+        Role roleInfo = getRoleInfoOf(userId, teamName,  oldRole);
+        roleInfo.setRole(newRole);
         roleRepository.save(roleInfo);
     }
 
@@ -87,5 +86,10 @@ public class RoleManagerService {
         List<Role> allTeamsOfUser = getAllTeamsOfUser(userId);
         List<List<Role>> accessRequestOfTeams = allTeamsOfUser.stream().map(role -> getWaitingRoleOfTeam(role.teamId)).collect(Collectors.toList());
         return accessRequestOfTeams.stream().flatMap(List::stream).collect(Collectors.toList());
+    }
+
+    public boolean isAdminOfTeam(String userId, String teamName) throws NoRoleForUserAndTeam {
+        Role roleInfoOf = getRoleInfoOf(userId, teamName, "ADMIN");
+        return roleInfoOf.role.equals("ADMIN");
     }
 }

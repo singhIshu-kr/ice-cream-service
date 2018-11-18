@@ -288,16 +288,18 @@ public class Controller {
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
+    @CrossOrigin
     @PostMapping("/permitAccess")
     public ResponseEntity alotRole(
-//            @RequestHeader(value = "email") String email,
-//            @RequestHeader(value = "accessToken") String accessToken,
+            @RequestHeader(value = "email") String email,
+            @RequestHeader(value = "accessToken") String accessToken,
             @RequestBody RoleUpdate roleUpdate) throws NoRoleForUserAndTeam {
-//        if (sessionService.isValidSession(accessToken, email)) {
-            roleManagerService.updateRole(roleUpdate.userId, roleUpdate.teamName, roleUpdate.role);
+        if (sessionService.isValidSession(accessToken, email) &&
+                roleManagerService.isAdminOfTeam(roleUpdate.userId,roleUpdate.teamName)) {
+            roleManagerService.updateRole(roleUpdate.requestUser, roleUpdate.teamName, roleUpdate.role, "WAITING");
             return new ResponseEntity(HttpStatus.OK);
-//        }
-//        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     @CrossOrigin
