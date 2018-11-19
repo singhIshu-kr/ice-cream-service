@@ -36,7 +36,7 @@ public class RoleManagerService {
 
     public List<Role> getAllTeamsOfUser(String userId) {
         List<Role> byUserId = roleRepository.findByUserId(userId);
-        return byUserId.stream().filter(roleTrack -> roleTrack.role.equals("ADMIN")).collect(Collectors.toList());
+        return byUserId.stream().filter(roleTrack -> roleTrack.role.equals("ADMIN") || roleTrack.role.equals("GUEST")).collect(Collectors.toList());
     }
 
     public List<Role> getAllEntries() {
@@ -91,5 +91,15 @@ public class RoleManagerService {
     public boolean isAdminOfTeam(String userId, String teamName) throws NoRoleForUserAndTeam {
         Role roleInfoOf = getRoleInfoOf(userId, teamName, "ADMIN");
         return roleInfoOf.role.equals("ADMIN");
+    }
+
+    public String getRoleOf(String userId, String teamName) {
+        return roleRepository
+                .findByUserId(userId)
+                .stream()
+                .filter(role -> role.teamId.equals(teamName))
+                .collect(Collectors.toList())
+                .get(0)
+                .role;
     }
 }
