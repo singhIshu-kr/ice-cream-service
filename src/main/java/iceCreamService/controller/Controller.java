@@ -47,7 +47,7 @@ public class Controller {
     public List<Role> getAllTheTeamWithRoles() {
         return roleManagerService.getAllEntries();
     }
-
+    
     @GetMapping("/")
     public String getHello() {
         return "Hiie";
@@ -136,7 +136,8 @@ public class Controller {
                 memberInfos.add(memberInfo);
             }));
             String teamName = userService.getName(email);
-            TeamInfo teamInfo = new TeamInfo(teamName, memberInfos);
+            String userType = roleManagerService.getRoleOf(email, teamID);
+            TeamInfo teamInfo = new TeamInfo(teamName, memberInfos, userType);
             return new ResponseEntity(teamInfo, HttpStatus.OK);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
