@@ -47,7 +47,7 @@ public class Controller {
     public List<Role> getAllTheTeamWithRoles() {
         return roleManagerService.getAllEntries();
     }
-    
+
     @GetMapping("/")
     public String getHello() {
         return "Hiie";

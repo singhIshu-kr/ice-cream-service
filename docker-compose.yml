@@ -1,0 +1,14 @@
+version: "3.1"
+
+services:
+  api:
+    image: icecream
+    ports:
+      - "8008:80"
+    links:
+      - mongo
+
+  mongo:
+    image: mvertes/alpine-mongo
+    ports:
+      - "27017:27017"

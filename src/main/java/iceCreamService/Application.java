@@ -53,7 +53,5 @@ public class Application implements CommandLineRunner{
 //        for (User user : userRepository.findAll()) {
 //            System.out.println(user);
 //        }
-
-        System.out.println(Arrays.stream(new String[]{"123","456"}).collect(Collectors.joining())+"demmoooooo");
     }
 }

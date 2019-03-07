@@ -21,7 +21,7 @@ public class Role {
 
     public void setRole(String role) {
         this.role = role;
-        System.out.println(this.role+role+"+++++++++++++++++");
+        System.out.println(this.role + role + "+++++++++++++++++");
     }
 
     @Override
